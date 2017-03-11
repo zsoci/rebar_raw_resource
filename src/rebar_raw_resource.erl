@@ -249,7 +249,13 @@ download(Dest, {?RTYPE, Spec, Opts}, State) ->
     #mod_dep{name = Name} = lookup_loc(Data, Loc),
     case Mod:download(Dest, Spec, State) of
         {'ok', _} = Ret ->
-            ensure_app(Dest, Mod, Name, Opts, Ret);
+            case proplists:get_value(app_file, Opts) of
+                True when (True =:= undefined) orelse
+                          (True =:= true) ->
+                    ensure_app(Dest, Mod, Name, Opts, Ret);
+                false ->
+                    Ret
+            end;
         Err ->
             Err
     end.
